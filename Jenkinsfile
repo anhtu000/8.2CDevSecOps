@@ -72,20 +72,25 @@ pipeline {
 
                         echo "Preparing SonarScanner CLI..."
 
-                        rm -rf sonar-scanner
-                        rm -rf sonar-scanner-${SCANNER_VERSION}-linux-x64
-                        rm -f sonar-scanner-cli-${SCANNER_VERSION}-linux-x64.zip
+                        if [ ! -f "sonar-scanner/bin/sonar-scanner" ]; then
+                            echo "SonarScanner not found. Downloading now..."
 
-                        curl -L -o sonar-scanner-cli-${SCANNER_VERSION}-linux-x64.zip \
-                        https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SCANNER_VERSION}-linux-x64.zip
+                            rm -rf sonar-scanner
+                            rm -rf sonar-scanner-${SCANNER_VERSION}-linux-x64
+                            rm -f sonar-scanner-cli-${SCANNER_VERSION}-linux-x64.zip
 
-                        unzip -q sonar-scanner-cli-${SCANNER_VERSION}-linux-x64.zip
+                            curl -L -o sonar-scanner-cli-${SCANNER_VERSION}-linux-x64.zip \
+                            https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SCANNER_VERSION}-linux-x64.zip
 
-                        mv sonar-scanner-${SCANNER_VERSION}-linux-x64 sonar-scanner
+                            unzip -q sonar-scanner-cli-${SCANNER_VERSION}-linux-x64.zip
+                            mv sonar-scanner-${SCANNER_VERSION}-linux-x64 sonar-scanner
+                        else
+                            echo "SonarScanner already exists. Skipping download."
+                        fi
 
                         echo "Running SonarCloud analysis..."
                         ./sonar-scanner/bin/sonar-scanner \
-                          -Dsonar.token=$SONAR_TOKEN
+                        -Dsonar.token=$SONAR_TOKEN
                     '''
                 }
             }
